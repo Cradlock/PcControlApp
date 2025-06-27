@@ -2,3 +2,4 @@ ixwebsocket/
 nlohmann/
 openssl/
 zlib/
+main.cpp

