@@ -52,7 +52,8 @@ void ErrorNotiffication(const char* message){
 
 
 
-int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
+// int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
+int main()
 {
     string BASE_URL;
 
@@ -67,7 +68,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     }
 
     file.close();
-
+    
+    cout << BASE_URL << endl;
     ix::initNetSystem();
     ix::WebSocket webSocket;
     webSocket.setUrl(BASE_URL); 
@@ -111,11 +113,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
     while(true){
         if(isConnect){
-        //   cout << '.';
+          cout << '.';
         }else{
           webSocket.send(send_data.dump());  
         //   cout << send_data["key"] << endl;
-        //   cout << send_data["name"] << endl;
+          cout << send_data["name"] << endl;
         }
         this_thread::sleep_for(std::chrono::seconds(1));
     }

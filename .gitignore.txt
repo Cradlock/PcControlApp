@@ -3,3 +3,7 @@ nlohmann/
 openssl/
 zlib/
 main.cpp
+
+*.manifest 
+*.rs
+*.res
