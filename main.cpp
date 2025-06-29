@@ -73,8 +73,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     bool isConnect = false;
     
     webSocket.setOnMessageCallback([&](const ix::WebSocketMessagePtr& msg) {
-        cout << msg->errorInfo.reason << endl;
-        cout << msg->closeInfo.reason << endl;
+         if (msg->type == ix::WebSocketMessageType::Open) {
+            isConnect = true;
+            
+        } else if (msg->type == ix::WebSocketMessageType::Close) {
+            isConnect = false;
+            
+        } 
         if(msg->type == ix::WebSocketMessageType::Message){
             if(!isConnect){
                 cout << "from server: " << msg->str << endl;
