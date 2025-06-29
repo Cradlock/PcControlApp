@@ -64,7 +64,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     
     ix::SocketTLSOptions tlsOptions;
     tlsOptions.tls = true;
-    cout << tlsOptions.getDescription() << endl;
 
     webSocket.setTLSOptions(tlsOptions);
 
@@ -73,16 +72,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     bool isConnect = false;
     
     webSocket.setOnMessageCallback([&](const ix::WebSocketMessagePtr& msg) {
-         if (msg->type == ix::WebSocketMessageType::Open) {
-            isConnect = true;
-            
-        } else if (msg->type == ix::WebSocketMessageType::Close) {
+         if (msg->type == ix::WebSocketMessageType::Close) {
             isConnect = false;
             
-        } 
-        if(msg->type == ix::WebSocketMessageType::Message){
+        } else if(msg->type == ix::WebSocketMessageType::Message){
             if(!isConnect){
-                cout << "from server: " << msg->str << endl;
                 isConnect = true;
             }else{
               try{  

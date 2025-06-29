@@ -1,1 +1,1 @@
-g++ main.cpp app_res.o -o Eye.exe -static -I"ixwebsocket" -L. -lixwebsocket -lws2_32  -I"." -I"openssl/include" -L"openssl/lib" -lssl  
+g++ main.cpp app_res.o ixwebsocket/ixwebsocket/*.cpp -DIXWEBSOCKET_USE_TLS=1 -DIXWEBSOCKET_USE_OPEN_SSL -mwindows -o Eye.exe  -static -I"ixwebsocket" -L. -lixwebsocket -I"." -I"openssl/include" -L"openssl/lib" -lssl -lcrypto -lcrypt32 -lws2_32 -lgdi32 -luser32 -lmswsock -lwsock32                
