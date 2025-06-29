@@ -1,2 +1,0 @@
-wss://pccontrolbackend.onrender.com/openC
-

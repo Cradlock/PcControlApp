@@ -127,26 +127,26 @@ namespace ix
         }
 #endif
 
-        (void) OpenSSL_add_ssl_algorithms();
-        (void) SSL_load_error_strings();
+        OPENSSL_init_ssl(0, NULL);
+
 
         _openSSLInitializationSuccessful = true;
     }
 
-    void SocketOpenSSL::openSSLLockingCallback(int mode,
-                                               int type,
-                                               const char* /*file*/,
-                                               int /*line*/)
-    {
-        if (mode & CRYPTO_LOCK)
-        {
-            openSSLMutexes[type]->lock();
-        }
-        else
-        {
-            openSSLMutexes[type]->unlock();
-        }
-    }
+    // void SocketOpenSSL::openSSLLockingCallback(int mode,
+    //                                            int type,
+    //                                            const char* /*file*/,
+    //                                            int /*line*/)
+    // {
+    //     if (mode & CRYPTO_LOCK)
+    //     {
+    //         openSSLMutexes[type]->lock();
+    //     }
+    //     else
+    //     {
+    //         openSSLMutexes[type]->unlock();
+    //     }
+    // }
 
     std::string SocketOpenSSL::getSSLError(int ret)
     {
@@ -315,7 +315,8 @@ namespace ix
 #endif
                                                std::string& errMsg)
     {
-        X509* server_cert = SSL_get_peer_certificate(ssl);
+        
+        X509* server_cert = SSL_get0_peer_certificate(ssl);
         if (server_cert == nullptr)
         {
             errMsg = "OpenSSL failed - peer didn't present a X509 certificate.";
@@ -707,7 +708,7 @@ namespace ix
                 return false;
             }
 
-            SSL_set_ecdh_auto(_ssl_connection, 1);
+            // SSL_set_ecdh_auto(_ssl_connection, 1);
 
             SSL_set_fd(_ssl_connection, _sockfd);
 

